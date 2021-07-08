@@ -14,36 +14,94 @@ app.use(express.json());
 
 // Star Wars Characters (DATA)
 
-const characters = [
-  {
-    routeName: 'yoda',
-    name: 'Yoda',
-    role: 'Jedi Master',
-    age: 900,
-    forcePoints: 2000,
-  },
-  {
-    routeName: 'darthmaul',
-    name: 'Darth Maul',
-    role: 'Sith Lord',
-    age: 200,
-    forcePoints: 1200,
-  },
-  {
-    routeName: 'obiwankenobi',
-    name: 'Obi Wan Kenobi',
-    role: 'Jedi Master',
-    age: 55,
-    forcePoints: 1350,
-  },
+var reservations = []
+var waitlist= []
+const guests = [ {
+  routeName: 'darthmaul',
+  id: 'Darth Maul',
+  name: 'Sith Lord',
+  email: 200,
+  phone: 1200,
+}
 ];
 
 // Routes
 
 // Basic route that sends the user first to the AJAX Page
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'view.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'home.html')));
 
-app.get('/add', (req, res) => res.sendFile(path.join(__dirname, 'add.html')));
+app.get('/tables', (req, res) => res.sendFile(path.join(__dirname, 'tables.html')));
+
+app.get('/reserve', (req, res) => res.sendFile(path.join(__dirname, 'reserve.html')));
+
+app.get('/tables/:guest', (req, res) => {
+  const chosen = req.params.guest;
+
+  console.log(chosen);
+
+  /* Check each character routeName and see if the same as "chosen"
+   If the statement is true, send the character back as JSON,
+   otherwise tell the user no character was found */
+
+  for (let i = 0; i < guests.length; i++) {
+    if (chosen === guests[i].routeName) {
+      return res.json(guests[i]);
+    }
+  }
+
+  return res.json(false);
+});
+//Create the logic that handles reservation requests. Your code should work such that POST requests take in JSON objects, checks if there is any space left, then adds the JSON object to either the reservation array or the waitlist array. Your POST route should also respond to requests with a confirmation (true or false) of whether or not the requestor has a reservation (or is on the waiting list).
+
+//You should be using Insomnia Core to do all your testing at this point.
+
+app.post('/tables', (req, res) => {
+  // req.body hosts is equal to the JSON post sent from the user
+  // This works because of our body parsing middleware
+  const newReserve = req.body;
+
+  // Using a RegEx Pattern to remove spaces from newCharacter
+  // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
+  newReserve.routeName = newReserve.name.replace(/\s+/g, '').toLowerCase();
+  console.log(newReserve);
+
+  reservations.push(newReserve);
+  res.json(newReserve);
+});
+
+ 
+
+app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Displays all characters
 app.get('/api/characters', (req, res) => res.json(characters));
@@ -84,4 +142,4 @@ app.post('/api/characters', (req, res) => {
 
 // Starts the server to begin listening
 
-app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
+
