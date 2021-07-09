@@ -8,7 +8,7 @@
   <!-- Latest compiled and minified CSS & JS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 </head>
@@ -24,11 +24,11 @@
       <h2 class="text-center">Make your reservation</h2>
       <br>
       <div class="text-center">
-        <a href="./tables.html">
+        <a href="/api/tables">
           <button class="btn btn-lg btn-primary">
             <span class="fa fa-list-alt"></span> View Tables</button>
         </a>
-        <a href="./home.html">
+        <a href="./">
           <button class="btn btn-lg btn-default">
             <span class="fa fa-home"></span>
           </button>
@@ -43,7 +43,7 @@
             Table Reservation
           </div>
           <div class="card-body">
-            <form role="form">
+            <form method="POST" role="form">
               <div class="form-group">
                 <label for="reserve-name">Name</label>
                 <input type="text" class="form-control" id="reserve-name">
@@ -59,9 +59,9 @@
               <div class="form-group">
                 <label for="reserve-unique-id">Unique ID</label>
                 <input type="text" class="form-control" id="reserve-unique-id">
-              </div>
-              <button type="submit" class="btn btn-primary submit">Submit</button>
+              </div
             </form>
+            <button type="submit" id="add-btn" class="btn btn-primary submit">Submit</button>
           </div>
         </div>
       </div>
@@ -89,15 +89,15 @@
   // Our api recognizes the route (/api/tables)... and then runs the associated code (found in api-routes.js).
   // In this case the associated code "saves" the data to the table-data.js file or waitinglist-data.js file
 
-  $(".submit").on("click", function(event) {
+  $("#add-btn").on("click", function(event) {
     event.preventDefault();
 
     // Here we grab the form elements
     var newReservation = {
-      customerName: $("#reserve-name").val().trim(),
-      phoneNumber: $("#reserve-phone").val().trim(),
-      customerEmail: $("#reserve-email").val().trim(),
-      customerID: $("#reserve-unique-id").val().trim()
+      name: $("#reserve-name").val().trim(),
+      phone: $("#reserve-phone").val().trim(),
+      email: $("#reserve-email").val().trim(),
+      id: $("#reserve-unique-id").val().trim()
     };
 
     console.log(newReservation);
@@ -107,27 +107,45 @@
     // The callback is the response of the server. In our case, we set up code in api-routes that "returns" true or false
     // depending on if a tables is available or not.
 
-    $.post("/api/tables", newReservation,
-      function(data) {
+    
 
-        // If a table is available... tell user they are booked.
-        if (data) {
-          alert("Yay! You are officially booked!");
-        }
-
-        // If a table is available... tell user they on the waiting list.
-        else {
-          alert("Sorry you are on the wait list");
-        }
-
-        // Clear the form when submitting
-        $("#reserve-name").val("");
-        $("#reserve-phone").val("");
-        $("#reserve-email").val("");
-        $("#reserve-unique-id").val("");
-
+    fetch('/api/reserve', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newReservation),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('tables.html', data);
+            alert(`Adding Reservation For:  ${data.name}`);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
       });
+    // $.post("/api/tables", newReservation,
+    //   function(data) {
 
-  });
+    //     // If a table is available... tell user they are booked.
+    //     if (data) {
+    //       alert("Yay! You are officially booked!");
+    //     }
+
+    //     // If a table is available... tell user they on the waiting list.
+    //     else {
+    //       alert("Sorry you are on the wait list");
+    //     }
+
+    //     // Clear the form when submitting
+    //     $("#reserve-name").val("");
+    //     $("#reserve-phone").val("");
+    //     $("#reserve-email").val("");
+    //     $("#reserve-unique-id").val("");
+
+    //   });
+
+
 
 </script>
